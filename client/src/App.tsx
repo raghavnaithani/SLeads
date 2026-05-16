@@ -3,17 +3,23 @@ import { Login } from '@/pages/Login';
 import { Register } from '@/pages/Register';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
-function DashboardPlaceholder() {
-  const logout = import('@/store/auth.store').then(m => m.useAuthStore.getState().logout);
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Leads } from '@/pages/Leads';
+
+function DashboardHome() {
   return (
-    <div className="flex flex-col h-screen items-center justify-center bg-background text-foreground gap-4">
-      <h1 className="text-3xl font-bold">Dashboard Placeholder</h1>
-      <button 
-        onClick={() => logout.then(fn => fn())} 
-        className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-      >
-        Logout
-      </button>
+    <div className="space-y-6 animate-in fade-in duration-300">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground text-sm">Welcome to SmartLeads.</p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h3 className="font-semibold text-lg">Total Leads</h3>
+          <p className="text-3xl font-bold text-primary mt-2">Manage</p>
+          <p className="text-sm text-muted-foreground mt-1">Navigate to Leads tab</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -26,7 +32,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPlaceholder />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardHome />} />
+            <Route path="/dashboard/leads" element={<Leads />} />
+          </Route>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
