@@ -53,8 +53,6 @@ const userSchema = new Schema<UserDocument>(
   },
 );
 
-userSchema.index({ email: 1 });
-
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, BCRYPT_SALT_ROUNDS);
