@@ -7,10 +7,9 @@ import {
   updateLead,
   deleteLead,
 } from '../controllers/lead.controller';
-import { authMiddleware, validate, roleMiddleware } from '../middlewares';
+import { authMiddleware, validate } from '../middlewares';
 import { validateQuery } from '../middlewares/validateQuery.middleware';
 import { createLeadSchema, updateLeadSchema, leadQuerySchema } from '../validators/lead.validator';
-import { UserRole } from '../interfaces';
 
 const router = Router();
 
@@ -23,6 +22,6 @@ router.get('/export/csv', getLeadsExportCsv);
 router.get('/:id', getLeadById);
 router.post('/', validate(createLeadSchema), createLead);
 router.patch('/:id', validate(updateLeadSchema), updateLead);
-router.delete('/:id', roleMiddleware(UserRole.ADMIN), deleteLead);
+router.delete('/:id', deleteLead);
 
 export default router;

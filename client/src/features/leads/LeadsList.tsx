@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { Plus, Search, Edit, Trash2, Download } from 'lucide-react';
@@ -24,6 +24,7 @@ export function LeadsList() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
+  const [sortFilter, setSortFilter] = useState<'latest' | 'oldest'>('latest');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<ILead | undefined>();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -35,9 +36,10 @@ export function LeadsList() {
       limit: 10,
       ...(search && { search }),
       ...(statusFilter && { status: statusFilter }),
-      ...(sourceFilter && { source: sourceFilter })
+      ...(sourceFilter && { source: sourceFilter }),
+      ...(sortFilter && { sort: sortFilter })
     }),
-    [page, search, statusFilter, sourceFilter]
+    [page, search, statusFilter, sourceFilter, sortFilter]
   );
 
   const { data, isLoading } = useQuery({
@@ -65,6 +67,16 @@ export function LeadsList() {
     setSearch(searchInput);
     setPage(1);
   };
+
+  useEffect(() => {
+    const trimmedSearch = searchInput.trim();
+    const timeoutId = window.setTimeout(() => {
+      setSearch(trimmedSearch);
+      setPage(1);
+    }, 400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchInput]);
 
   const handleExportCsv = () => {
     try {
@@ -139,6 +151,10 @@ export function LeadsList() {
               <option key={s} value={s}>{s}</option>
             ))}
           </Select>
+          <Select value={sortFilter} onChange={e => { setSortFilter(e.target.value as 'latest' | 'oldest'); setPage(1); }}>
+            <option value="latest">Latest</option>
+            <option value="oldest">Oldest</option>
+          </Select>
         </div>
       </div>
 
@@ -171,6 +187,7 @@ export function LeadsList() {
               ) : (
                 data?.data.map(lead => {
                   const canEdit = isAdmin || lead.createdBy._id === user?._id;
+                  const canDelete = isAdmin || lead.createdBy._id === user?._id;
                   return (
                     <tr key={lead._id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-6 py-4">
@@ -199,8 +216,18 @@ export function LeadsList() {
                               <Edit className="h-4 w-4" />
                             </Button>
                           )}
-                          {isAdmin && (
+                          {canDelete ? (
                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => { setLeadToDelete(lead._id); setIsDeleteDialogOpen(true); }}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive/40"
+                              disabled
+                              title="Only the lead owner or an admin can delete this lead"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           )}

@@ -40,6 +40,7 @@ export const updateLead = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const deleteLead = asyncHandler(async (req: Request, res: Response) => {
-  await leadService.deleteLead(req.params.id as string);
+  const { userId, role } = (req as AuthenticatedRequest).user;
+  await leadService.deleteLead(req.params.id as string, userId, role);
   ApiResponse.success(res, null, 'Lead deleted successfully');
 });

@@ -67,10 +67,14 @@ export class LeadService {
     return this.leadRepo.update(id, input);
   }
 
-  async deleteLead(id: string) {
+  async deleteLead(id: string, userId: string, userRole: UserRole) {
     const lead = await this.leadRepo.findById(id);
     if (!lead) {
       throw new NotFoundError('Lead');
+    }
+
+    if (userRole === UserRole.SALES && String(lead.createdBy._id) !== userId) {
+      throw new ForbiddenError('You can only delete your own leads');
     }
 
     return this.leadRepo.delete(id);
