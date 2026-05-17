@@ -31,6 +31,15 @@ export class LeadRepository {
     };
   }
 
+  async findAllWithoutPagination(filters: Omit<ILeadFilters, 'page' | 'limit'>) {
+    const query = this.buildQuery(filters as ILeadFilters);
+    const sort = this.buildSort(filters.sort);
+
+    return Lead.find(query)
+      .sort(sort)
+      .populate('createdBy', 'name email');
+  }
+
   async findById(id: string): Promise<LeadDocument | null> {
     return Lead.findById(id).populate('createdBy', 'name email');
   }

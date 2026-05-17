@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { LogOut, Users, LayoutDashboard, UserCircle, Sun, Moon } from 'lucide-react';

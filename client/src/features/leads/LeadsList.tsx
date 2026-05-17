@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { leadApi } from '@/api/lead.api';
 import { useAuthStore } from '@/store/auth.store';
@@ -66,6 +66,34 @@ export function LeadsList() {
     setPage(1);
   };
 
+  const handleExportCsv = () => {
+    try {
+      const token = localStorage.getItem('token');
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+
+      const params = new URLSearchParams();
+      if (token) params.append('token', token);
+      if (search) params.append('search', search);
+      if (statusFilter) params.append('status', statusFilter);
+      if (sourceFilter) params.append('source', sourceFilter);
+
+      const exportUrl = `${baseUrl}/leads/export/csv?${params.toString()}`;
+
+      const link = document.createElement('a');
+      link.href = exportUrl;
+      link.rel = 'noreferrer';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Leads exported successfully!');
+    } catch (error: any) {
+      console.error('Export CSV error:', error);
+      toast.error('Failed to export leads');
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -74,6 +102,10 @@ export function LeadsList() {
           <p className="text-muted-foreground text-sm">View, filter, and manage your sales leads.</p>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={handleExportCsv}>
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
           <Button onClick={() => { setSelectedLead(undefined); setIsFormOpen(true); }}>
             <Plus className="mr-2 h-4 w-4" />
             Add Lead
@@ -185,11 +217,11 @@ export function LeadsList() {
         {data?.pagination && data.pagination.totalPages > 1 && (
           <div className="px-6 py-4 border-t border-border flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Showing <span className="font-medium">{(page - 1) * 10 + 1}</span> to <span className="font-medium">{Math.min(page * 10, data.pagination.total)}</span> of <span className="font-medium">{data.pagination.total}</span> leads
+              Showing <span className="font-medium">{(page - 1) * 10 + 1}</span> to <span className="font-medium">{Math.min(page * 10, data.pagination.total || 0)}</span> of <span className="font-medium">{data.pagination.total || 0}</span> leads
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</Button>
-              <Button variant="outline" size="sm" disabled={page === data.pagination.totalPages} onClick={() => setPage(p => Math.min(data.pagination.totalPages || 1, p + 1))}>Next</Button>
+              <Button variant="outline" size="sm" disabled={page === data.pagination?.totalPages} onClick={() => setPage(p => Math.min(data.pagination?.totalPages || 1, p + 1))}>Next</Button>
             </div>
           </div>
         )}

@@ -13,6 +13,29 @@ export class LeadService {
     return this.leadRepo.findAll(filters);
   }
 
+  async getLeadsExportCsv(filters: Omit<ILeadFilters, 'page' | 'limit'>) {
+    const leads = await this.leadRepo.findAllWithoutPagination(filters);
+    
+    const headers = ['ID', 'Name', 'Email', 'Status', 'Source', 'Created By (Name)', 'Created By (Email)', 'Created At'];
+    const rows = leads.map(lead => [
+      String(lead._id),
+      lead.name.replace(/"/g, '""'),
+      lead.email.replace(/"/g, '""'),
+      lead.status,
+      lead.source,
+      lead.createdBy ? (lead.createdBy as any).name.replace(/"/g, '""') : 'N/A',
+      lead.createdBy ? (lead.createdBy as any).email.replace(/"/g, '""') : 'N/A',
+      lead.createdAt.toISOString()
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(val => `"${val}"`).join(','))
+    ].join('\n');
+
+    return csvContent;
+  }
+
   async getLeadById(id: string) {
     const lead = await this.leadRepo.findById(id);
     if (!lead) {

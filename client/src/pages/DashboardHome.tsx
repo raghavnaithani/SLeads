@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import {
@@ -18,6 +17,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import type { ILead } from '@/types/lead.types';
 
 export function DashboardHome() {
   const { user } = useAuthStore();
@@ -30,22 +30,22 @@ export function DashboardHome() {
     queryFn: () => leadApi.getLeads({ page: 1, limit: 100 })
   });
 
-  const leads = data?.leads || [];
+  const leads = data?.data || [];
 
   // Compute analytics
   const totalLeads = leads.length;
-  const newLeads = leads.filter(l => l.status === 'new').length;
-  const contactedLeads = leads.filter(l => l.status === 'contacted').length;
-  const qualifiedLeads = leads.filter(l => l.status === 'qualified').length;
-  const lostLeads = leads.filter(l => l.status === 'lost').length;
+  const newLeads = leads.filter((l: ILead) => l.status === 'new').length;
+  const contactedLeads = leads.filter((l: ILead) => l.status === 'contacted').length;
+  const qualifiedLeads = leads.filter((l: ILead) => l.status === 'qualified').length;
+  const lostLeads = leads.filter((l: ILead) => l.status === 'lost').length;
 
   const activePipeline = newLeads + contactedLeads;
   const conversionRate = totalLeads > 0 ? Math.round((qualifiedLeads / totalLeads) * 100) : 0;
 
   // Source breakdown
-  const websiteCount = leads.filter(l => l.source === 'website').length;
-  const instagramCount = leads.filter(l => l.source === 'instagram').length;
-  const referralCount = leads.filter(l => l.source === 'referral').length;
+  const websiteCount = leads.filter((l: ILead) => l.source === 'website').length;
+  const instagramCount = leads.filter((l: ILead) => l.source === 'instagram').length;
+  const referralCount = leads.filter((l: ILead) => l.source === 'referral').length;
 
   const websitePercent = totalLeads > 0 ? Math.round((websiteCount / totalLeads) * 100) : 0;
   const instagramPercent = totalLeads > 0 ? Math.round((instagramCount / totalLeads) * 100) : 0;

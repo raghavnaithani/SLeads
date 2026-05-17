@@ -12,6 +12,16 @@ export const getLeads = asyncHandler(async (req: Request, res: Response) => {
   ApiResponse.success(res, result.leads, 'Leads fetched successfully', 200, result.pagination);
 });
 
+export const getLeadsExportCsv = asyncHandler(async (req: Request, res: Response) => {
+  const filters = req.query as unknown as Omit<ILeadFilters, 'page' | 'limit'>;
+  const csvContent = await leadService.getLeadsExportCsv(filters);
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="leads_export.csv"');
+  res.setHeader('Cache-Control', 'no-store');
+  res.status(200).send(csvContent);
+});
+
 export const getLeadById = asyncHandler(async (req: Request, res: Response) => {
   const lead = await leadService.getLeadById(req.params.id as string);
   ApiResponse.success(res, lead, 'Lead fetched successfully');

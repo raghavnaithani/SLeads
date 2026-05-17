@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   getLeads,
+  getLeadsExportCsv,
   getLeadById,
   createLead,
   updateLead,
@@ -18,6 +19,7 @@ router.use(authMiddleware);
 
 // CRUD
 router.get('/', validateQuery(leadQuerySchema), getLeads);
+router.get('/export/csv', getLeadsExportCsv);
 router.get('/:id', getLeadById);
 router.post('/', validate(createLeadSchema), createLead);
 router.patch('/:id', validate(updateLeadSchema), updateLead);
