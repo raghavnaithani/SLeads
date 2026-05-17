@@ -10,12 +10,17 @@ export interface AuthenticatedRequest extends Request {
 
 export const authMiddleware = (req: Request, _res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
+  let token = '';
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new UnauthorizedError('No token provided');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token as string;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    throw new UnauthorizedError('No token provided');
+  }
 
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET) as IUserPayload;

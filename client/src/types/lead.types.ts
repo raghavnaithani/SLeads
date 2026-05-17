@@ -1,18 +1,17 @@
 import type { IUser } from './auth.types';
 
 export const LeadStatus = {
-  NEW: 'New',
-  CONTACTED: 'Contacted',
-  QUALIFIED: 'Qualified',
-  LOST: 'Lost',
+  NEW: 'new',
+  CONTACTED: 'contacted',
+  QUALIFIED: 'qualified',
+  LOST: 'lost',
 } as const;
 export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus];
 
 export const LeadSource = {
-  WEBSITE: 'Website',
-  REFERRAL: 'Referral',
-  COLD_CALL: 'Cold Call',
-  ADVERTISEMENT: 'Advertisement',
+  WEBSITE: 'website',
+  REFERRAL: 'referral',
+  INSTAGRAM: 'instagram',
 } as const;
 export type LeadSource = (typeof LeadSource)[keyof typeof LeadSource];
 

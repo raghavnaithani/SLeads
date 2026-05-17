@@ -51,13 +51,6 @@ export class LeadRepository {
     return Lead.findByIdAndDelete(id);
   }
 
-  async findAllForExport(filters: ILeadFilters): Promise<LeadDocument[]> {
-    const query = this.buildQuery(filters);
-    const sort = this.buildSort(filters.sort);
-
-    return Lead.find(query).sort(sort).populate('createdBy', 'name email');
-  }
-
   private buildQuery(filters: ILeadFilters): FilterQuery<LeadDocument> {
     const query: FilterQuery<LeadDocument> = {};
 

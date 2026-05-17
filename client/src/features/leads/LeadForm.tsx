@@ -15,7 +15,7 @@ const leadSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
   email: z.string().email('Invalid email address'),
   status: z.enum([LeadStatus.NEW, LeadStatus.CONTACTED, LeadStatus.QUALIFIED, LeadStatus.LOST]).optional(),
-  source: z.enum([LeadSource.WEBSITE, LeadSource.REFERRAL, LeadSource.COLD_CALL, LeadSource.ADVERTISEMENT]),
+  source: z.enum([LeadSource.WEBSITE, LeadSource.REFERRAL, LeadSource.INSTAGRAM]),
 });
 
 type LeadValues = z.infer<typeof leadSchema>;
@@ -81,7 +81,7 @@ export function LeadForm({ initialData, onClose }: LeadFormProps) {
         <Label htmlFor="source">Source</Label>
         <Select id="source" {...register('source')} error={errors.source?.message}>
           {Object.values(LeadSource).map((source) => (
-            <option key={source} value={source}>
+            <option key={source} value={source} className="capitalize">
               {source}
             </option>
           ))}
@@ -93,7 +93,7 @@ export function LeadForm({ initialData, onClose }: LeadFormProps) {
           <Label htmlFor="status">Status</Label>
           <Select id="status" {...register('status')} error={errors.status?.message}>
             {Object.values(LeadStatus).map((status) => (
-              <option key={status} value={status}>
+              <option key={status} value={status} className="capitalize">
                 {status}
               </option>
             ))}

@@ -31,15 +31,4 @@ export const leadApi = {
   deleteLead: async (id: string): Promise<void> => {
     await api.delete(`/leads/${id}`);
   },
-
-  exportCsvUrl: (filters: ILeadFilters) => {
-    // Generate URL string for the browser to download directly
-    const params = new URLSearchParams();
-    if (filters.status) params.append('status', filters.status);
-    if (filters.source) params.append('source', filters.source);
-    if (filters.search) params.append('search', filters.search);
-    if (filters.sort) params.append('sort', filters.sort);
-    
-    return `${import.meta.env.VITE_API_URL || '/api/v1'}/leads/export/csv?${params.toString()}`;
-  },
 };

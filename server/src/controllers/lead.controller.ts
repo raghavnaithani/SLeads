@@ -33,23 +33,3 @@ export const deleteLead = asyncHandler(async (req: Request, res: Response) => {
   await leadService.deleteLead(req.params.id as string);
   ApiResponse.success(res, null, 'Lead deleted successfully');
 });
-
-export const exportLeads = asyncHandler(async (req: Request, res: Response) => {
-  const filters = req.query as unknown as ILeadFilters;
-  const leads = await leadService.exportLeads(filters);
-
-  const headers = ['Name', 'Email', 'Status', 'Source', 'Created At'];
-  const rows = leads.map((lead) => [
-    lead.name,
-    lead.email,
-    lead.status,
-    lead.source,
-    lead.createdAt.toISOString(),
-  ]);
-
-  const csv = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
-
-  res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename=leads-export.csv');
-  res.send(csv);
-});

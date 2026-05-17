@@ -52,8 +52,4 @@ export class LeadService {
 
     return this.leadRepo.delete(id);
   }
-
-  async exportLeads(filters: ILeadFilters) {
-    return this.leadRepo.findAllForExport(filters);
-  }
 }

@@ -5,7 +5,6 @@ import {
   createLead,
   updateLead,
   deleteLead,
-  exportLeads,
 } from '../controllers/lead.controller';
 import { authMiddleware, validate, roleMiddleware } from '../middlewares';
 import { validateQuery } from '../middlewares/validateQuery.middleware';
@@ -16,9 +15,6 @@ const router = Router();
 
 // All lead routes require authentication
 router.use(authMiddleware);
-
-// CSV export (before :id to avoid conflict)
-router.get('/export/csv', validateQuery(leadQuerySchema), exportLeads);
 
 // CRUD
 router.get('/', validateQuery(leadQuerySchema), getLeads);
