@@ -44,9 +44,7 @@ yarn.lock
 *.temp
 
 # Docker (local development only)
-.dockerignore
-Dockerfile
-docker-compose.yml
+# Allow tracking of Dockerfiles and docker-compose configs for submission
 
 # Assignment / planning docs (not for repo)
 assignment_text.txt
