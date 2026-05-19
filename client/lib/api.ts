@@ -222,3 +222,23 @@ export async function logout() {
   const response = await request<ApiEnvelope<null>>('/auth/logout', { method: 'POST' });
   return response.message;
 }
+
+export async function getUsers() {
+  const response = await request<ApiEnvelope<User[]>>('/users');
+  return response.data;
+}
+
+export async function updateUserRole(id: string, role: UserRole) {
+  const response = await request<ApiEnvelope<User>>(`/users/${id}/role`, {
+    method: 'PATCH',
+    body: JSON.stringify({ role }),
+  });
+  return response.data;
+}
+
+export async function deleteUser(id: string) {
+  const response = await request<ApiEnvelope<null>>(`/users/${id}`, {
+    method: 'DELETE',
+  });
+  return response.message;
+}

@@ -34,20 +34,24 @@ This system represents a clean architecture with a separate layer design, advanc
 * **Route Protection**: Implemented via Next.js Middleware (`client/middleware.ts`) for subsecond redirects of unauthenticated users requesting `/dashboard/*`.
 * **Revocation Blacklist**: Token blacklist persists revoked keys to prevent replay attacks post-logout (survives container/process restarts).
 
-### 2. Role-Based Access Control (RBAC)
-* **`admin` Role**: Full access to view, create, edit, and delete any lead in the database.
-* **`sales` Role**: Can view all leads and create new leads, but can only edit leads they personally created. Prevented from deleting leads at both UI and API routing levels.
+### 2. Role-Based Access Control (RBAC) & User Management
+* **`admin` Role**: Full access to view, create, edit, and delete any lead. Additionally, admins have access to a dedicated **Users Management** dashboard panel where they can view all registered users, promote sales reps to admins, demote other admins, or delete user accounts.
+* **`sales` Role**: Can view all leads and create new leads, but can only edit leads they personally created. Prevented from deleting leads, listing users, or changing user roles.
+* **Access Safeguards**: Strict checks prevent admins from self-deleting their own account or self-demoting their role if they are the last remaining administrator in the system.
 
-### 3. Advanced Filtering, Search & Sorting
+### 3. Database Auto-Bootstrapping
+* **Super-Admin Seeding**: Upon connecting to an empty database (first-time launch), the backend automatically seeds a default system administrator account (`admin@sleads.com` / `Password123`). This allows instant, secure access for testing and evaluation without exposing insecure public signup selectors.
+
+### 4. Advanced Filtering, Search & Sorting
 * **Debounced Search**: Search queries against name or email are debounced (350ms) using a custom react hook (`useDebounce`) to avoid overloading database connection limits.
 * **Combined Filters**: Multiple filters (Status + Source + Search + Sorting) act concurrently in a single Mongoose query builder on the backend.
 * **Server-Side Pagination**: Implemented using optimized Mongo `skip()` and `limit()` methods returning pagination metadata records (`total`, `page`, `limit`, `totalPages`).
 
-### 4. Filter-Synchronized CSV Export
+### 5. Filter-Synchronized CSV Export
 * **Query Alignment**: Exporting triggers an endpoint matching all active search and filter conditions, omitting limit restrictions.
 * **Data Sanitization**: Double-quotes inside user fields (e.g. name or company) are escaped (`""`) to ensure RFC-4180 compliance.
 
-### 5. Polished Responsive UI/UX
+### 6. Polished Responsive UI/UX
 * **Dark Mode**: Integrated via `next-themes` provider tracking system defaults and user toggles.
 * **Rich Interactions**: Clean modern look utilizing gradients, glassmorphism overlays, custom sidebar animations, and hover glow effects.
 * **State Handlers**: Explicit empty search states, loading skeletons, spinner indicators, and toast error notifications.
@@ -91,9 +95,9 @@ server/
 │   ├── middlewares/        # JWT auth, role validation, Zod request body/query parsers
 │   ├── models/             # Mongoose schemas (User and Lead)
 │   ├── repositories/       # Isolated Mongoose queries (Find, Count, Populate)
-│   ├── routes/             # Versioned express routers (/api/v1/*)
+│   ├── routes/             # Router files, including user.routes.ts (User management)
 │   ├── services/           # Business logic: RBAC checks & CSV formatting
-│   ├── utils/              # Envelope formatters (ApiResponse) and logout blacklists
+│   ├── utils/              # ApiResponse, logout blacklists, and bootstrap.ts (Admin seeder)
 │   └── app.ts              # Express initialization, security middlewares, and rate limiters
 ├── tsconfig.json           # TS compiling configurations
 ├── Dockerfile              # Alpine Node.js multi-stage build script
@@ -107,6 +111,7 @@ client/
 │   ├── (dashboard)/        # Route group wrapping sidebar & header dashboards
 │   │   ├── dashboard/      # Overview metrics panel
 │   │   ├── dashboard-leads/# Interactive CRUD table with debounced search
+│   │   ├── dashboard-users/# Users Management role switcher & deletion panel
 │   │   └── dashboard-profile/ # Profile view
 │   ├── globals.css         # Theme style sheets and animations
 │   ├── layout.tsx          # Root font mapping & providers

@@ -92,6 +92,9 @@ The system enforces strict route and service level verification based on user ro
 | `/leads/:id` | `PATCH` | Yes | `admin`, `sales` | `admin` can edit any lead. `sales` can **only** edit leads they created. |
 | `/leads/:id` | `DELETE` | Yes | `admin` | Restricted at route level to `admin` users only. |
 | `/leads/export/csv` | `GET` | Yes | `admin`, `sales` | Both roles can export CSVs respecting current filters. |
+| `/users` | `GET` | Yes | `admin` | Fetches list of all registered users in the database. |
+| `/users/:id/role` | `PATCH` | Yes | `admin` | Toggles role of a user (`admin`/`sales`). Prevents last admin self-demoting. |
+| `/users/:id` | `DELETE` | Yes | `admin` | Permanently deletes a user account. Prevents self-deletion. |
 
 ---
 
@@ -383,6 +386,89 @@ Deletes a lead from the system.
 * **Error Responses:**
   * `403 Forbidden` — Caller role is `sales`.
   * `404 Not Found` — Lead not found.
+
+---
+
+### User Management Routes
+
+#### `GET /users`
+Fetches a list of all registered users in the database, sorted by registration date (newest first).
+* **Authentication:** Required
+* **Access Rules:** Restricted to the `admin` role at the route middleware level.
+* **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Users fetched successfully",
+    "data": [
+      {
+        "_id": "603f7e1b9b1d8e12ac41a39f",
+        "name": "System Administrator",
+        "email": "admin@sleads.com",
+        "role": "admin",
+        "createdAt": "2026-05-20T02:47:50.000Z",
+        "updatedAt": "2026-05-20T02:47:50.000Z"
+      },
+      {
+        "_id": "603f7f2b9b1d8e12ac41a4a1",
+        "name": "Rahul Sharma",
+        "email": "rahul@test.com",
+        "role": "sales",
+        "createdAt": "2026-05-20T01:10:00.000Z",
+        "updatedAt": "2026-05-20T01:15:00.000Z"
+      }
+    ]
+  }
+  ```
+* **Error Responses:**
+  * `403 Forbidden` — Non-admin trying to access user accounts.
+
+#### `PATCH /users/:id/role`
+Updates a user's role privilege level between `admin` and `sales`.
+* **Authentication:** Required
+* **Access Rules:** Restricted to the `admin` role.
+  * *Self-Demotion Safeguard*: Blocks the action with `400 Bad Request` if the logged-in admin tries to demote themselves and they are the last administrator in the database.
+* **Payload Validation:**
+  ```ts
+  role: "admin" | "sales" (required)
+  ```
+* **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "User role updated to admin successfully",
+    "data": {
+      "_id": "603f7f2b9b1d8e12ac41a4a1",
+      "name": "Rahul Sharma",
+      "email": "rahul@test.com",
+      "role": "admin",
+      "createdAt": "2026-05-20T01:10:00.000Z",
+      "updatedAt": "2026-05-20T02:50:00.000Z"
+    }
+  }
+  ```
+* **Error Responses:**
+  * `400 Bad Request` — Invalid role value, or demoting the only remaining administrator.
+  * `403 Forbidden` — Access denied (non-admin).
+  * `404 Not Found` — User account not found.
+
+#### `DELETE /users/:id`
+Deletes a user account from the system.
+* **Authentication:** Required
+* **Access Rules:** Restricted to the `admin` role.
+  * *Self-Deletion Safeguard*: Blocks the action with `400 Bad Request` if the logged-in admin tries to delete their own account.
+* **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "User deleted successfully",
+    "data": null
+  }
+  ```
+* **Error Responses:**
+  * `400 Bad Request` — Attempting to delete own admin account.
+  * `403 Forbidden` — Access denied (non-admin).
+  * `404 Not Found` — User account not found.
 
 ---
 

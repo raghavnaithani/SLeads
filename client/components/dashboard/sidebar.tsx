@@ -1,12 +1,12 @@
 "use client";
 
 import Link from 'next/link';
-import { LayoutDashboard, Users, User, LogOut, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Users, User, LogOut, Sun, Moon, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { clearAuthSession, getStoredUser } from '@/lib/session';
 import { logout as apiLogout } from '@/lib/api';
-import type { User } from '@/lib/api';
+import type { User as ApiUser } from '@/lib/api';
 
 interface SidebarProps {
   open: boolean;
@@ -16,11 +16,11 @@ interface SidebarProps {
 export default function Sidebar({ open, onToggle }: SidebarProps) {
   const router = useRouter();
   const [isDark, setIsDark] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ApiUser | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
-    setUser(getStoredUser<User>());
+    setUser(getStoredUser<ApiUser>());
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDark(true);
@@ -109,6 +109,20 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
             <Users className="w-5 h-5 group-hover:scale-110 transition-transform" />
             Leads
           </Link>
+
+          {user?.role === 'admin' && (
+            <Link
+              href="/dashboard-users"
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group ${
+                pathname?.startsWith('/dashboard-users')
+                  ? 'bg-gradient-to-r from-primary/15 to-primary/5 text-primary font-semibold'
+                  : 'text-sidebar-foreground font-medium hover:bg-sidebar-accent/50 hover:text-primary'
+              }`}
+            >
+              <Shield className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              Users Management
+            </Link>
+          )}
 
           <Link
             href="/dashboard-profile"
