@@ -229,22 +229,7 @@ To shut down and prune database volumes:
 docker compose down -v
 ```
 
----
 
-## 🧪 Automated Test Suite
-
-A standalone test runner script is located in `server/test_suite.js`. It runs a battery of integration tests covering registration, login, token verification, CRUD, Zod validation errors, pagination checks, sorting, search filtering, and CSV download generation.
-
-To execute the tests:
-1. Ensure the server is running (`npm run dev` inside `/server`).
-2. Run the test command:
-```bash
-cd server
-node test_suite.js
-```
-The console will print a detailed assertion walkthrough and output success upon completion.
-
----
 
 ## ☁️ Deployment Guide (Vercel & Atlas)
 
