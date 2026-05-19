@@ -12,11 +12,7 @@ export class LeadRepository {
     const skip = (page - 1) * limit;
 
     const [leads, total] = await Promise.all([
-      Lead.find(query)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .populate('createdBy', 'name email'),
+      Lead.find(query).sort(sort).skip(skip).limit(limit).populate('createdBy', 'name email'),
       Lead.countDocuments(query),
     ]);
 
@@ -35,9 +31,7 @@ export class LeadRepository {
     const query = this.buildQuery(filters as ILeadFilters);
     const sort = this.buildSort(filters.sort);
 
-    return Lead.find(query)
-      .sort(sort)
-      .populate('createdBy', 'name email');
+    return Lead.find(query).sort(sort).populate('createdBy', 'name email');
   }
 
   async findById(id: string): Promise<LeadDocument | null> {

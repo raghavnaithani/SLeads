@@ -7,10 +7,7 @@ export const createLeadSchema = z.object({
     .trim()
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name must be at most 100 characters'),
-  email: z
-    .string({ required_error: 'Email is required' })
-    .trim()
-    .email('Invalid email address'),
+  email: z.string({ required_error: 'Email is required' }).trim().email('Invalid email address'),
   status: z.enum(LEAD_STATUSES).optional(),
   source: z.enum(LEAD_SOURCES, { required_error: 'Source is required' }),
 });
@@ -22,11 +19,7 @@ export const updateLeadSchema = z.object({
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name must be at most 100 characters')
     .optional(),
-  email: z
-    .string()
-    .trim()
-    .email('Invalid email address')
-    .optional(),
+  email: z.string().trim().email('Invalid email address').optional(),
   status: z.enum(LEAD_STATUSES).optional(),
   source: z.enum(LEAD_SOURCES).optional(),
 });

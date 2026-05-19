@@ -28,12 +28,32 @@ yarn-error.log*
 
 # Testing
 coverage/
+__tests__/
+*.test.js
+*.test.ts
+*.test.tsx
+jest.config.js
+
+# Dependency lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
 
 # Temporary files
 *.tmp
 *.temp
 
+# Docker (local development only)
+.dockerignore
+Dockerfile
+docker-compose.yml
+
 # Assignment / planning docs (not for repo)
 assignment_text.txt
 smart_leads_dashboard_master_implementation_plan.md
 Full Stack Intern Assigment.pdf
+TESTING_IMPLEMENTATION_PLAN.md
+
+# Accidental test subfolders
+server/client/
+server/server/

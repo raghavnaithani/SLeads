@@ -2,6 +2,19 @@ import { LeadRepository } from '../repositories/lead.repository';
 import { ICreateLeadInput, IUpdateLeadInput, ILeadFilters, UserRole } from '../interfaces';
 import { NotFoundError, ForbiddenError } from '../errors';
 
+type LeadExportRecord = {
+  _id: unknown;
+  name: string;
+  email: string;
+  status: string;
+  source: string;
+  createdBy: {
+    name?: string;
+    email?: string;
+  } | null;
+  createdAt: Date;
+};
+
 export class LeadService {
   private leadRepo: LeadRepository;
 
@@ -14,23 +27,32 @@ export class LeadService {
   }
 
   async getLeadsExportCsv(filters: Omit<ILeadFilters, 'page' | 'limit'>) {
-    const leads = await this.leadRepo.findAllWithoutPagination(filters);
-    
-    const headers = ['ID', 'Name', 'Email', 'Status', 'Source', 'Created By (Name)', 'Created By (Email)', 'Created At'];
-    const rows = leads.map(lead => [
+    const leads = (await this.leadRepo.findAllWithoutPagination(filters)) as LeadExportRecord[];
+
+    const headers = [
+      'ID',
+      'Name',
+      'Email',
+      'Status',
+      'Source',
+      'Created By (Name)',
+      'Created By (Email)',
+      'Created At',
+    ];
+    const rows = leads.map((lead) => [
       String(lead._id),
       lead.name.replace(/"/g, '""'),
       lead.email.replace(/"/g, '""'),
       lead.status,
       lead.source,
-      lead.createdBy ? (lead.createdBy as any).name.replace(/"/g, '""') : 'N/A',
-      lead.createdBy ? (lead.createdBy as any).email.replace(/"/g, '""') : 'N/A',
-      lead.createdAt.toISOString()
+      lead.createdBy?.name?.replace(/"/g, '""') ?? 'N/A',
+      lead.createdBy?.email?.replace(/"/g, '""') ?? 'N/A',
+      lead.createdAt.toISOString(),
     ]);
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(val => `"${val}"`).join(','))
+      ...rows.map((row) => row.map((val) => `"${val}"`).join(',')),
     ].join('\n');
 
     return csvContent;
@@ -48,12 +70,7 @@ export class LeadService {
     return this.leadRepo.create({ ...input, createdBy: userId });
   }
 
-  async updateLead(
-    id: string,
-    input: IUpdateLeadInput,
-    userId: string,
-    userRole: UserRole,
-  ) {
+  async updateLead(id: string, input: IUpdateLeadInput, userId: string, userRole: UserRole) {
     const lead = await this.leadRepo.findById(id);
     if (!lead) {
       throw new NotFoundError('Lead');

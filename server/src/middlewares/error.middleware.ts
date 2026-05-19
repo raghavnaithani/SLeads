@@ -23,7 +23,10 @@ export const errorMiddleware = (
   } else if (err.name === 'CastError') {
     statusCode = 400;
     message = 'Invalid resource ID';
-  } else if (err.name === 'MongoServerError' && (err as unknown as Record<string, unknown>).code === 11000) {
+  } else if (
+    err.name === 'MongoServerError' &&
+    (err as unknown as Record<string, unknown>).code === 11000
+  ) {
     statusCode = 409;
     message = 'Duplicate field value — resource already exists';
   } else if (err.name === 'JsonWebTokenError') {
@@ -53,9 +56,7 @@ export const errorMiddleware = (
     response.errors = errors;
   }
 
-  if (env.NODE_ENV === 'development') {
-    response.stack = err.stack;
-  }
+  // Never include stack traces in HTTP responses to avoid leaking internals.
 
   res.status(statusCode).json(response);
 };

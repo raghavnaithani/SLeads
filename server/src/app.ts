@@ -18,7 +18,16 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: (origin, callback) => {
+      // Allow server-to-server or same-origin requests with no Origin header
+      if (!origin) return callback(null, true);
+      // Allow configured origin
+      if (origin === env.CORS_ORIGIN) return callback(null, true);
+      // In development, allow any localhost origin (useful when Vite picks a different port)
+      if (env.NODE_ENV === 'development' && origin.startsWith('http://localhost')) return callback(null, true);
+      // Explicitly disallow other origins
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   }),
 );
@@ -59,14 +68,17 @@ app.use((_req, res) => {
 app.use(errorMiddleware);
 
 // ── Start Server ───────────────────────────────────────────
-const startServer = async () => {
-  await connectDatabase();
-
-  app.listen(env.PORT, () => {
-    console.info(`Server running on port ${env.PORT} [${env.NODE_ENV}]`);
-  });
-};
-
-startServer();
+if (!process.env.VERCEL) {
+  const startServer = async () => {
+    await connectDatabase();
+    app.listen(env.PORT, () => {
+      console.info(`Server running on port ${env.PORT} [${env.NODE_ENV}]`);
+    });
+  };
+  startServer();
+} else {
+  // On Vercel, connect database globally
+  connectDatabase();
+}
 
 export default app;
