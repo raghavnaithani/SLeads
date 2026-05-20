@@ -129,7 +129,7 @@ async function request<T>(path: string, init: RequestInit = {}) {
   return parseResponse<T>(response);
 }
 
-function toQueryString(params: Record<string, string | number | undefined>) {
+function toQueryString(params: Record<string, any>) {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {

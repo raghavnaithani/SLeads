@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, User, LogOut, Sun, Moon, Search } from 'lucide-react';
+import { Menu, User as UserIcon, LogOut, Sun, Moon, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { clearAuthSession, getStoredUser } from '@/lib/session';
@@ -125,7 +125,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 }}
                 className="w-full text-left px-4 py-2.5 hover:bg-muted transition-colors text-foreground font-medium flex items-center gap-2"
               >
-                <User className="w-4 h-4" />
+                <UserIcon className="w-4 h-4" />
                 Profile
               </button>
 
